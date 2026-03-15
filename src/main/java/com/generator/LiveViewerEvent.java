@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class LiveViewerEvent {
     private String eventType; // livein or liveout
     private String userId;
-    private String streamId;
     private String channelId;
     private long eventTime;
 }

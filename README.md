@@ -20,15 +20,15 @@ This project is used to generate test data in the following scenarios
 ### Topic
 ```declarative
 Kafka
-├── live-in
-└── live-out
+├── livein
+└── liveout
 ```
 ### Data Schema
 ```declarative
 {
   "eventType": "livein",
   "userId": "user-123",
-  "streamId": 202603152233489,
+  "streamId": "550e8400e29b41d4a716446655440000",
   "channeId": "youtube-a",
   "eventTime": 1710000005000
 }

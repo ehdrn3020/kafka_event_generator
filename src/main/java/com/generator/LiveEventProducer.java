@@ -1,23 +1,24 @@
-package com.gernerator;
+package com.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.UUID;
 
 public class LiveEventProducer {
-    private static final String IN_TOPIC = "live-in";
-    private static final String OUT_TOPIC = "live-out";
+    private static final Logger log = LoggerFactory.getLogger(LiveEventProducer.class);
+
+    private static final String IN_TOPIC = "livein";
+    private static final String OUT_TOPIC = "liveout";
 
     private final KafkaProducer<String, String> producer;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Random random = new Random();
-
-    private final List<String> streamIds = List.of("stream-1001", "stream-1002", "stream-1003");
     private final List<String> channelIds = List.of("youtube-a", "youtube-b", "youtube-c");
 
     public LiveEventProducer(String bootstrapServers) {
@@ -33,27 +34,37 @@ public class LiveEventProducer {
     public void start() throws Exception {
         while (true) {
             boolean isEnter = random.nextBoolean();
-
-            int idx = random.nextInt(streamIds.size());
-            String streamId = streamIds.get(idx);
+            int idx = random.nextInt(channelIds.size());
             String channelId = channelIds.get(idx);
             String userId = "user-" + (random.nextInt(10000) + 1);
 
-            LiveEventProducer event = new LiveEventProducer(
-                    isEnter ? "livein" : "liveout",
-                    userId,
-                    streamId,
-                    channelId,
-                    System.currentTimeMillis()
+            LiveViewerEvent event = new LiveViewerEvent(
+                isEnter ? "livein" : "liveout",
+                userId,
+                channelId,
+                System.currentTimeMillis()
             );
 
             String topic = isEnter ? IN_TOPIC : OUT_TOPIC;
             String json = objectMapper.writeValueAsString(event);
 
             ProducerRecord<String, String> record = new ProducerRecord<>(topic, userId, json);
-            producer.send(record);
 
-            System.out.println("Sent to topic=" + topic + ", message=" + json);
+            producer.send(record, (metadata, exception) -> {
+                if (exception != null) {
+                    log.error(
+                        "[Fail]. topic={}, key={}, payload={}",
+                        topic, userId, json, exception
+                    );
+                } else {
+                    log.info(
+                        "[SUCCESS]. topic={}, partition={}, offset={}, key={}",
+                        metadata.topic(), metadata.partition(), metadata.offset(), userId
+                    );
+                }
+            });
+
+            log.info("Generated event. topic={}, payload={}", topic, json);
 
             Thread.sleep(1000);
         }
