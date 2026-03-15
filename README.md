@@ -28,7 +28,6 @@ Kafka
 {
   "eventType": "livein",
   "userId": "user-123",
-  "streamId": "550e8400e29b41d4a716446655440000",
   "channeId": "youtube-a",
   "eventTime": 1710000005000
 }
@@ -37,5 +36,15 @@ Kafka
 
 ### Run
 ```declarative
+// 실행 & 중지 
+docker compose up -d --build
+docker compose down -v
 
+// 토픽 확인
+docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh \
+--bootstrap-server localhost:9092 \
+--topic livein
+
+// 로그 확인
+docker logs -f kafka-event-generator
 ```
