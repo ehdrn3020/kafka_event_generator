@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.generator'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+application {
+    mainClass = 'com.generator.Main'
+}
+
+dependencies {
+    implementation 'org.apache.kafka:kafka-clients:3.7.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+}
+
+tasks.named('jar') {
+    manifest {
+        attributes 'Main-Class': 'com.generator.Main'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
