@@ -26,10 +26,10 @@ Kafka
 ### Data Schema
 ```declarative
 {
-  "eventType": "livein",
-  "userId": "user-123",
-  "channeId": "youtube-a",
-  "eventTime": 1710000005000
+    "eventType": "livein",
+    "userId": "user-7095",
+    "channelId": "youtube-c",
+    "eventTime": 1773668485841
 }
 ```
 ---
@@ -47,4 +47,7 @@ docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh \
 
 // 로그 확인
 docker logs -f kafka-event-generator
+
+// Kafbat UI 접속
+http://localhost:8080/
 ```
